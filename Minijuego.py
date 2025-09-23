@@ -8,6 +8,14 @@ import time
 # Constantes de resolución
 FRAME_W, FRAME_H = 1366, 768
 
+# Paleta de colores (BGR)
+COLOR_TEXTO_PRINCIPAL = (84, 53, 55)    # #373554 (gris-azulado oscuro)
+COLOR_BOTONES = (239, 216, 160)         # #A0D8EF (azul cielo pastel)
+COLOR_BOTONES_SELECCION = (219, 196, 140) # Sombra para los botones no seleccionados
+COLOR_DESTACADOS = (207, 177, 178)      # #B2B1CF (violeta grisáceo)
+COLOR_ATENCION = (207, 177, 178)        # #B2B1CF (violeta grisáceo)
+COLOR_FONDO = (0, 20, 64)           # #ECE9F7 (lila muy claro)
+
 # Configuración de rutas
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 pokemon_folder = os.path.join(BASE_DIR, "Pokemon")
@@ -30,7 +38,7 @@ pokemons = [f for f in os.listdir(pokemon_folder) if f.lower().endswith(".png") 
 pokeballs = [f for f in os.listdir(pokemon_folder) if "ball" in f.lower() and f.lower().endswith(".png")]
 
 if not pokemons or not pokeballs:
-    print("No hay imágenes de Pokémon o Pokeball en la carpeta Pokemon.")
+    print("No hay imágenes de Pokemon o Pokeball en la carpeta Pokemon.")
     exit()
 
 masterball_name = None
@@ -146,17 +154,17 @@ def mostrar_menu():
     while True:
         menu_frame = np.zeros((FRAME_H, FRAME_W, 3), dtype=np.uint8)
         # Fondo y título con degradado
-        cv2.rectangle(menu_frame, (0, 0), (FRAME_W, FRAME_H), (10, 10, 40), -1)
-        draw_text_centered(menu_frame, "Minijuego Pokemon", 120, 3, (255, 255, 0), 7)
+        cv2.rectangle(menu_frame, (0, 0), (FRAME_W, FRAME_H), COLOR_FONDO, -1)
+        draw_text_centered(menu_frame, "Minijuego Pokemon", 120, 3, COLOR_ATENCION, 7)
         
         # Dibujar botones
         for i, opcion in enumerate(opciones):
             x1, y1, x2, y2 = coords_opciones[i]
-            color = (0, 255, 0) if seleccion == i else (100, 255, 100)
+            color = COLOR_BOTONES if seleccion == i else COLOR_BOTONES_SELECCION
             draw_rounded_rectangle(menu_frame, (x1, y1), (x2, y2), color, thickness=cv2.FILLED)
-            draw_text_centered(menu_frame, opcion, y1 + 55, 1.5, (0, 0, 0), 3)
+            draw_text_centered(menu_frame, opcion, y1 + 55, 1.5, COLOR_TEXTO_PRINCIPAL, 3)
 
-        draw_text_centered(menu_frame, "Haz clic en una opción para seleccionar", FRAME_H - 50, 1.2, (200, 200, 200), 2, font=cv2.FONT_HERSHEY_PLAIN)
+        draw_text_centered(menu_frame, "Haz clic en una opcion para seleccionar", FRAME_H - 50, 1.2, COLOR_TEXTO_PRINCIPAL, 2, font=cv2.FONT_HERSHEY_PLAIN)
         
         cv2.imshow("Minijuego Pokemon", menu_frame)
         key = cv2.waitKey(20)
@@ -175,14 +183,14 @@ def mostrar_instrucciones():
         "- Presiona ESC para volver al menú principal."
     ]
     
-    cv2.rectangle(frame, (0, 0), (FRAME_W, FRAME_H), (10, 10, 40), -1)
-    draw_text_centered(frame, "INSTRUCCIONES", 120, 2.5, (255, 255, 0), 5)
+    cv2.rectangle(frame, (0, 0), (FRAME_W, FRAME_H), COLOR_FONDO, -1)
+    draw_text_centered(frame, "INSTRUCCIONES", 120, 2.5, COLOR_ATENCION, 5)
 
     y_start = 220
     for i, linea in enumerate(instrucciones):
-        draw_text_centered(frame, linea, y_start + i * 60, 1.2, (255, 255, 255), 2, font=cv2.FONT_HERSHEY_SIMPLEX)
+        draw_text_centered(frame, linea, y_start + i * 60, 1.2, COLOR_TEXTO_PRINCIPAL, 2, font=cv2.FONT_HERSHEY_SIMPLEX)
     
-    draw_text_centered(frame, "Presiona ESC para volver", FRAME_H - 50, 1, (200, 200, 200), 2, font=cv2.FONT_HERSHEY_PLAIN)
+    draw_text_centered(frame, "Presiona ESC para volver", FRAME_H - 50, 1, COLOR_TEXTO_PRINCIPAL, 2, font=cv2.FONT_HERSHEY_PLAIN)
 
     cv2.imshow("Instrucciones", frame)
     while True:
@@ -202,22 +210,22 @@ def mostrar_puntuaciones():
     puntuaciones.sort(key=lambda x: x[1], reverse=True)
 
     frame = np.zeros((FRAME_H, FRAME_W, 3), dtype=np.uint8)
-    cv2.rectangle(frame, (0, 0), (FRAME_W, FRAME_H), (10, 10, 40), -1)
-    draw_text_centered(frame, "PUNTUACIONES", 120, 2.5, (255, 255, 0), 5)
+    cv2.rectangle(frame, (0, 0), (FRAME_W, FRAME_H), COLOR_FONDO, -1)
+    draw_text_centered(frame, "PUNTUACIONES", 120, 2.5, COLOR_ATENCION, 5)
     
     board_x, board_y, board_w, board_h = (FRAME_W - 600) // 2, 200, 600, 400
-    cv2.rectangle(frame, (board_x, board_y), (board_x + board_w, board_y + board_h), (20, 20, 80), -1)
-    draw_rounded_rectangle(frame, (board_x, board_y), (board_x + board_w, board_y + board_h), (100, 100, 255), 2)
+    cv2.rectangle(frame, (board_x, board_y), (board_x + board_w, board_y + board_h), COLOR_TEXTO_PRINCIPAL, -1)
+    draw_rounded_rectangle(frame, (board_x, board_y), (board_x + board_w, board_y + board_h), COLOR_DESTACADOS, 2)
     
-    draw_text_centered(frame, "TOP 10", board_y + 40, 1, (255, 255, 255), 2)
+    draw_text_centered(frame, "TOP 10", board_y + 40, 1, COLOR_BOTONES, 2)
     
     for i, (nombre, puntaje) in enumerate(puntuaciones[:10]):
         y = board_y + 80 + i * 30
-        color = (0, 255, 255) if i == 0 else (255, 255, 255)
+        color = COLOR_DESTACADOS if i == 0 else COLOR_TEXTO_PRINCIPAL
         text_line = f"{i+1}. {nombre} - {puntaje}"
         draw_text_centered(frame, text_line, y, 0.8, color, 2)
 
-    draw_text_centered(frame, "Presiona ESC para volver", FRAME_H - 50, 1, (200, 200, 200), 2, font=cv2.FONT_HERSHEY_PLAIN)
+    draw_text_centered(frame, "Presiona ESC para volver", FRAME_H - 50, 1, COLOR_TEXTO_PRINCIPAL, 2, font=cv2.FONT_HERSHEY_PLAIN)
     
     cv2.imshow("Puntuaciones", frame)
     while True:
@@ -272,10 +280,10 @@ def jugar():
         frame = cv2.flip(frame, 1)
         frame = cv2.resize(frame, (FRAME_W, FRAME_H))
         
-        cv2.rectangle(frame, (0, 0), (FRAME_W, FRAME_H), (0, 0, 0), -1)
+        cv2.rectangle(frame, (0, 0), (FRAME_W, FRAME_H), COLOR_FONDO, -1)
         countdown_num = 5 - int(time.time() - countdown_start_time)
         text_to_show = f"Preparate en... {countdown_num}"
-        draw_text_centered(frame, text_to_show, FRAME_H // 2, 2.5, (0, 255, 255), 5)
+        draw_text_centered(frame, text_to_show, FRAME_H // 2, 2.5, COLOR_ATENCION, 5)
         cv2.imshow("Minijuego Pokemon", frame)
         if cv2.waitKey(1) & 0xFF == 27:
             break
@@ -361,7 +369,7 @@ def jugar():
             
             confeti_frames = 30
             confeti_coords = draw_confetti(frame, cantidad=80)
-            draw_text_centered(frame, "¡Pokemon Atrapado!", 100, 1.5, (0, 255, 0), 3)
+            draw_text_centered(frame, "¡Pokemon Atrapado!", 100, 1.5, COLOR_ATENCION, 3)
 
             current_pokemon_path = os.path.join(pokemon_folder, random.choice(pokemons))
             current_pokemon = load_png(current_pokemon_path)
@@ -373,7 +381,7 @@ def jugar():
             vidas -= 1
             confeti_frames = 20
             confeti_coords = draw_confetti(frame, cantidad=40)
-            draw_text_centered(frame, "¡Pokemon Escapó!", 100, 1.5, (0, 0, 255), 3)
+            draw_text_centered(frame, "¡Pokemon Escapó!", 100, 1.5, COLOR_DESTACADOS, 3)
 
         if confeti_frames > 0:
             show_confetti(frame, confeti_coords)
@@ -381,23 +389,23 @@ def jugar():
         
         # Mostrar logros
         if achievement_unlocked_message and (time.time() - achievement_display_start_time < 3):
-            cv2.rectangle(frame, (w - 450, h - 100), (w - 10, h - 10), (50, 50, 50), -1)
-            cv2.putText(frame, "Logro Desbloqueado:", (w - 430, h - 60), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 0), 2)
-            cv2.putText(frame, achievement_unlocked_message, (w - 430, h - 30), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2)
+            cv2.rectangle(frame, (w - 450, h - 100), (w - 10, h - 10), COLOR_TEXTO_PRINCIPAL, -1)
+            cv2.putText(frame, "Logro Desbloqueado:", (w - 430, h - 60), cv2.FONT_HERSHEY_SIMPLEX, 0.8, COLOR_BOTONES, 2)
+            cv2.putText(frame, achievement_unlocked_message, (w - 430, h - 30), cv2.FONT_HERSHEY_SIMPLEX, 1.2, COLOR_DESTACADOS, 2)
         else:
             achievement_unlocked_message = None
 
         # Mostrar estadísticas del juego
-        cv2.putText(frame, f"Atrapados: {score}", (20, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 0), 3)
-        cv2.putText(frame, f"Vidas: {vidas}", (20, 100), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 3)
+        cv2.putText(frame, f"Atrapados: {score}", (20, 50), cv2.FONT_HERSHEY_COMPLEX, 1, COLOR_BOTONES, 3)
+        cv2.putText(frame, f"Vidas: {vidas}", (20, 100), cv2.FONT_HERSHEY_COMPLEX, 1, COLOR_DESTACADOS, 3)
 
         if vidas == 0:
             nombre = ""
             while len(nombre) < 3:
                 temp_frame = frame.copy()
-                draw_text_centered(temp_frame, "GAME OVER", FRAME_H // 2 - 100, 2, (0, 0, 255), 5)
-                draw_text_centered(temp_frame, f"Tu puntuacion: {score}", FRAME_H // 2, 1.5, (255, 255, 0), 3)
-                draw_text_centered(temp_frame, f"Ingrese sus iniciales: {nombre}", FRAME_H // 2 + 100, 1.5, (255, 255, 255), 3)
+                draw_text_centered(temp_frame, "GAME OVER", FRAME_H // 2 - 100, 2, COLOR_DESTACADOS, 5)
+                draw_text_centered(temp_frame, f"Tu puntuacion: {score}", FRAME_H // 2, 1.5, COLOR_BOTONES, 3)
+                draw_text_centered(temp_frame, f"Ingrese sus iniciales: {nombre}", FRAME_H // 2 + 100, 1.5, COLOR_TEXTO_PRINCIPAL, 3)
                 cv2.imshow("Minijuego Pokemon", temp_frame)
                 key = cv2.waitKey(0)
                 if 65 <= key <= 90 or 97 <= key <= 122:
